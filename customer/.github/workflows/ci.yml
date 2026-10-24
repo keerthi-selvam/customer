@@ -1,0 +1,49 @@
+
+name: Customer Service CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  build-and-analyze:
+    name: Build, Test and SonarQube
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test
+        run: mvn -B clean verify
+
+      - name: Check Java lint
+        run: mvn -B checkstyle:check
+
+      - name: SonarQube Cloud analysis and Quality Gate
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          mvn -B
+          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dsonar.organization=keerthi-selvam
+          -Dsonar.projectKey=keerthi-selvam_customer
+          -Dsonar.qualitygate.wait=true
+          -Dsonar.qualitygate.timeout=300
