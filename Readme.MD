@@ -3,7 +3,6 @@ docker run --name local-vault `
 -e VAULT_DEV_ROOT_TOKEN_ID=dev-only-token `
 hashicorp/vault
 
-
 vault token generated as Root token 
 hashicorp/vault:latest 8200/tcp
 
